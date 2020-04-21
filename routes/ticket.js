@@ -61,26 +61,6 @@ router.post('/ticket',(req, res)=>{
          
 
 })
-
-
-
-// router.put('/ticket/:ticket_id', (req, res) => {
-//     console.log(req.params)
-//     res.send('first put')
-// })
-
-
-
-
-
-
-
-
-
-
-
-
-
 //update a ticket, update open/closed and user_details
 router.put('/ticket/:ticket_id', (req, res) => {
     //check indempotency for ticket booking status
@@ -97,8 +77,8 @@ router.put('/ticket/:ticket_id', (req, res) => {
         passenger = req.body.passenger
     }
     //res.send('hello')
-    if (payload.is_booked == true) {
-        console.log('ho')
+    if (payload.is_booked == false) {
+        
         Ticket.findById(ticket_id, function (err, ticket) {
            
             if (err) res.status(404).json({ message: err })
@@ -106,41 +86,25 @@ router.put('/ticket/:ticket_id', (req, res) => {
                 
                 const user_id = ticket.passenger
                 console.log(user_id)
-                User.remove({ _id: user_id }, function (err) {
+                User.deleteOne() ({ _id: user_id }, function (err) {
                     if (err) {
                         res.status(404).json({ message: err })
                     }
                     else {
                         ticket.is_booked = payload.is_booked
-                        const user = new User(req.body.passenger)
-                        user.save()
-                        .then(data => {
-                            if (data) {
-                                ticket.passenger = user._id
-                                ticket.save()
-                                    .then(data => res.status(200).json(data))
-                                    .catch(err => {
-                                        User.findOneAndDelete({ _id: user._id })
-                                            .then((data) => res.status(400))
-                                            .catch(err => res.status(400).json({ message: err }))
-                                    })
-                                
-                            }
-                        })
-                        .catch(err => res.status(404).json({ message: err }))
+                       
 
 
-
-                        // ticket.save()
-                        //     .then(data => res.status(200).json(data))
-                        //     .catch(err => res.status(404).json(err))
+                        ticket.save()
+                            .then(data => res.status(200).json(data))
+                            .catch(err => res.status(404).json(err))
                     }
                 })
             }
         })
     }
 //res.send('hello')
-    if (payload.is_booked == false && passenger != null) {
+    if (payload.is_booked == true && passenger != null) {
         Ticket.findById(ticket_id, function (err, ticket) {
             if (err) res.status(404).json({ message: err })
             if (ticket) {
@@ -163,7 +127,8 @@ router.put('/ticket/:ticket_id', (req, res) => {
 router.put('/user/:ticket_id', (req, res) => {
     const { ticket_id } = req.params
     const payload = req.body
-
+    console.log(req.params)
+    console.log(req.body)
     Ticket.findById(ticket_id, function (err, ticket) {
         if (err) res.status(404).json({ message: err })
         if (ticket) {
@@ -182,6 +147,7 @@ router.put('/user/:ticket_id', (req, res) => {
                 .catch(err => res.status(404).json({ message: err }))
         }
     })
+    //res.send('hi')
 })
 
 // get the status of a ticket based on ticket_id
@@ -234,31 +200,4 @@ router.get('/ticket/details/:ticket_id', (req, res) => {
         }
     })
 })
-
-router.post('/tickets/reset', (req, res) => {
-
-    if (!("username" in req.body) && !("password" in req.body)) {
-        res.status(400).json({ message: "username and password is needed in request body" })
-    }
-
-    const { username, password } = req.body
-
-    if (!(bcrypt.compareSync(password, process.env.PASSWORD_HASH))) {
-
-    }
-    if (!(username === process.env.USER)) {
-        res.status(400).json({ message: "username is incorrect" })
-    }
-
-    Ticket.find({}, (err, data) => {
-        if (err) res.status(404).json({ message: err })
-        if (data) {
-            data.forEach(openTicket)
-            res.status(200).json({ message: "success" })
-        }
-    })
-
-})
-
-
 module.exports = router
