@@ -2,7 +2,7 @@ const express = require('express')
 const Ticket = require('../models/Ticket')
 const User = require('../models/User')
 const validation = require('../middleware/validation/validation')
-const bcrypt = require('bcrypt')
+//const bcrypt = require('bcrypt')
 const userValidation = validation.userValidation
 const openTicket = validation.openTicketa
 
