@@ -12,7 +12,7 @@ router.use(express.urlencoded({ extended: false }));
 router.use(express.json());
 
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3003
     router.listen(port, () => {
         console.log('Server is up on port ' + port)
     })
