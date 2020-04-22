@@ -12,7 +12,7 @@ router.use(express.urlencoded({ extended: false }));
 router.use(express.json());
 
 
-const port = process.env.PORT || 3003
+const port = process.env.PORT || 3000
     router.listen(port, () => {
         console.log('Server is up on port ' + port)
     })
@@ -193,29 +193,29 @@ router.get('/ticket/details/:ticket_id', (req, res) => {
     })
 })
 
-/*
-router.put('/tickets/changestatus', (req, res) => {
-    Ticket.find({is_booked: false},(err, ticket) => {
-        if (err) res.status(404).json({ message: err })
-        if (ticket) {
+
+// router.patch('/tickets/changestatus', (req, res) => {
+//     Ticket.find({is_booked: false},(err, ticket) => {
+//         if (err) res.status(404).json({ message: err })
+//         if (ticket) {
             
-            const user_id = ticket.passenger
-            console.log(user_id)
-            User.deleteOne ({ _id: user_id }, function (err) {
-                if (err) {
-                    res.status(404).json({ message: err })
-                }
-                else {
-                    ticket.is_booked = true
+//             const user_id = ticket.passenger
+//             console.log(user_id)
+//             User.deleteOne ({ _id: user_id }, function (err) {
+//                 if (err) {
+//                     res.status(404).json({ message: err })
+//                 }
+//                 else {
+//                     ticket.is_booked = true
                    
 
 
-                    ticket.save()
-                        .then(data => res.status(200).json(data))
-                        .catch(err => res.status(404).json(err))
-                }
-            })
-        }
-    })
-})*/
+//                     ticket.save()
+//                         .then(data => res.status(200).json(data))
+//                         .catch(err => res.status(404).json(err))
+//                 }
+//             })
+//         }
+//     })
+//})
 module.exports = router
