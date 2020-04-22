@@ -4,7 +4,6 @@ const User = require('../models/User')
 const validation = require('../middleware/validation/validation')
 //const bcrypt = require('bcrypt')
 const userValidation = validation.userValidation
-const openTicket = validation.openTicketa
 
 const router = express()
 //create a ticket
@@ -27,7 +26,7 @@ router.post('/ticket',(req, res)=>{
      const ticket = new Ticket({ seat_number: req.body.seat_number })
      const user = new User(req.body.passenger)
      Ticket.find({seat_number:ticket.seat_number},(err, data) => {
-        if(data.length>0 && !data[0].is_booked)
+        if(data.length>0 && data[0].is_booked)
             res.status(400).json('sorry seat is '.concat(ticket.seat_number,' is closed'))
         else{
      
@@ -60,7 +59,7 @@ router.put('/ticket/:ticket_id', (req, res) => {
         passenger = req.body.passenger
     }
     
-    if (payload.is_booked == true) {
+    if (payload.is_booked == false) {
         
         Ticket.findById(ticket_id, function (err, ticket) {
            
@@ -86,7 +85,7 @@ router.put('/ticket/:ticket_id', (req, res) => {
             }
         })
     }
-    if (payload.is_booked == false && passenger != null) {
+    if (payload.is_booked == true && passenger != null) {
         Ticket.findById(ticket_id, function (err, ticket) {
             if (err) res.status(404).json({ message: err })
             if (ticket) {
@@ -113,6 +112,9 @@ router.put('/user/:ticket_id', (req, res) => {
     console.log(req.body)
     Ticket.findById(ticket_id, function (err, ticket) {
         if (err) res.status(404).json({ message: err })
+        if(ticket.is_booked==false)
+             res.status(404).json('ticket is closed')
+        else{
         if (ticket) {
             const user_id = ticket.passenger
             User.findById(user_id)
@@ -128,7 +130,9 @@ router.put('/user/:ticket_id', (req, res) => {
                 })
                 .catch(err => res.status(404).json({ message: err }))
         }
+        }
     })
+
 
 })
 
@@ -183,6 +187,32 @@ router.get('/ticket/details/:ticket_id', (req, res) => {
             User.findById(ticket.passenger, function (err, user) {
                 if (err) res.status(404).json({ message: err })
                 if (user) res.status(200).json(user)
+            })
+        }
+    })
+})
+
+
+router.put('/tickets/changestatus', (req, res) => {
+    Ticket.find({is_booked: false},(err, ticket) => {
+        if (err) res.status(404).json({ message: err })
+        if (ticket) {
+            
+            const user_id = ticket.passenger
+            console.log(user_id)
+            User.deleteOne ({ _id: user_id }, function (err) {
+                if (err) {
+                    res.status(404).json({ message: err })
+                }
+                else {
+                    ticket.is_booked = true
+                   
+
+
+                    ticket.save()
+                        .then(data => res.status(200).json(data))
+                        .catch(err => res.status(404).json(err))
+                }
             })
         }
     })
