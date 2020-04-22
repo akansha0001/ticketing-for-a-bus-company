@@ -4,6 +4,7 @@ const User = require('../models/User')
 const validation = require('../middleware/validation/validation')
 //const bcrypt = require('bcrypt')
 const userValidation = validation.userValidation
+const openTicket = validation.openTicket
 
 const router = express()
 //create a ticket
@@ -192,7 +193,7 @@ router.get('/ticket/details/:ticket_id', (req, res) => {
     })
 })
 
-
+/*
 router.put('/tickets/changestatus', (req, res) => {
     Ticket.find({is_booked: false},(err, ticket) => {
         if (err) res.status(404).json({ message: err })
@@ -216,5 +217,5 @@ router.put('/tickets/changestatus', (req, res) => {
             })
         }
     })
-})
+})*/
 module.exports = router
