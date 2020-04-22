@@ -53,39 +53,33 @@ router.post('/ticket',(req, res)=>{
 router.put('/ticket/:ticket_id', (req, res) => {
     //check indempotency for ticket booking status
     const { ticket_id } = req.params
-     const payload = req.body
-     let passenger = null 
+    const payload = req.body
+    let passenger = null
+
     if ('passenger' in payload) {
-        
         passenger = req.body.passenger
     }
-    
+
     if (payload.is_booked == false) {
-        
         Ticket.findById(ticket_id, function (err, ticket) {
-           
             if (err) res.status(404).json({ message: err })
             if (ticket) {
-                
                 const user_id = ticket.passenger
-                console.log(user_id)
-                User.deleteOne ({ _id: user_id }, function (err) {
+                User.remove({ _id: user_id }, function (err) {
                     if (err) {
                         res.status(404).json({ message: err })
                     }
                     else {
                         ticket.is_booked = payload.is_booked
-                       
-
-
                         ticket.save()
                             .then(data => res.status(200).json(data))
                             .catch(err => res.status(404).json(err))
                     }
-                })
+                });
             }
         })
     }
+
     if (payload.is_booked == true && passenger != null) {
         Ticket.findById(ticket_id, function (err, ticket) {
             if (err) res.status(404).json({ message: err })
@@ -103,9 +97,10 @@ router.put('/ticket/:ticket_id', (req, res) => {
             }
         })
     }
- })
+})
 
-// // edit details of a user 
+
+// // editn details of a user 
 router.put('/user/:ticket_id', (req, res) => {
     const { ticket_id } = req.params
     const payload = req.body
