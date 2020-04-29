@@ -188,7 +188,7 @@ router.get('/ticket/details/:ticket_id', (req, res) => {
 })
 
 
-router.put('/tickets/changestatus', (req, res) => {
+router.patch('/tickets/changestatus', (req, res) => {
     Ticket.find({is_booked: true},(err, ticket) => {
         if (ticket) {
             const user_id = ticket.passenger
