@@ -64,7 +64,7 @@ router.put('/ticket/:ticket_id', (req, res) => {
             if (err) res.status(404).json({ message: err })
             if (ticket) {
                 const user_id = ticket.passenger
-                User.remove({ _id: user_id }, function (err) {
+                User.deleteOne({ _id: user_id }, function (err) {
                     if (err) {
                         res.status(404).json({ message: err })
                     }
