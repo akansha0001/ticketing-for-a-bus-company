@@ -37,7 +37,7 @@ router.post('/ticket',(req, res)=>{
                     ticket.save()
                         .then(data => res.status(200).json(data))
                         .catch(err => {
-                         User.findOneAndDelete({ _id: user._id })
+                         User.deleteOne({ _id: user._id })
                             .then((data) => res.status(400))
                             .catch(err => res.status(400).json({ message: err }))
                     })
@@ -191,19 +191,42 @@ router.get('/ticket/details/:ticket_id', (req, res) => {
 router.patch('/tickets/changestatus', (req, res) => {
     Ticket.find({is_booked: true},(err, ticket) => {
         if (ticket) {
-            const user_id = ticket.passenger
-            User.remove({ _id: user_id }, function (err) {
+           // console.log(ticket.length)
+            if (err) res.status(404).json({ message: err })
+            let k;
+            
+            for (let i = 0; i < ticket.length; i++)
+            {
+                k=i
+                const user_id = ticket[i].passenger
+                
+                User.deleteOne({ _id: user_id }, function (err) {
                 if (err) {
                     res.status(404).json({ message: err })
                 }
                 else {
-                    ticket.is_booked = false
-                    ticket.save()
-                        .then(data => res.status(200).json(data))
+                    //console.log(ticket[i])
+                    ticket[i].is_booked = false
+                    ticket[i].save()
                         .catch(err => res.status(404).json(err))
                 }
+             
              })
+             
+            }
+            if(k+1==ticket.length || ticket.length==0)
+            {
+             Ticket.find({ is_booked: false }, (err, data) => {
+                if (err) res.status(404).json({ message: err })
+                if (data) res.status(200).json(data)})
+            }
+       
+           
         }
+    
+        
+       
+        
 })
 })
 module.exports = router
